@@ -16,7 +16,8 @@ except ImportError:
 import sys, os
 import authorize
 
-install_requires = [] # ["lxml>=2.0.0"] still required to run tests though
+install_requires = []
+tests_require = ["lxml>=2.0.0"]
 
 setup = setuptools.setup
 find_packages = setuptools.find_packages
@@ -36,6 +37,8 @@ setup(
     license = "MIT License",
     version=authorize.__version__,
     install_requires=install_requires,
+    tests_require=tests_require,
+    test_suite="runtests.runtests",
     classifiers = [
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
