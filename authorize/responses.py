@@ -69,6 +69,52 @@ _arb_response_codes = [
     ['E00038', 'The subscription cannot be canceled.', 'Subscriptions that are expired or terminated cannot be canceled.']
 ]
 
+_trans_detail_response_codes = [
+    ['I00001', 'Successful', 'The request was processed successfully.'],
+    ['I00002', 'The subscription has already been cancelled.', 'The subscription has already been canceled.'],
+    ['I00003', 'The record has already been deleted.', 'The record has already been deleted.'],
+    ['I00004', 'No records found', 'No records have been found that match your query.'],
+    ['E00001', 'An error occurred during processing. Please try again.', 'An unexpected system error occurred while processing this request.'],
+    ['E00002', 'The content-type specified is not supported.', 'The only supported content-types are text/xml and application/xml.'],
+    ['E00003', 'An error occurred while parsing the XML request.', 'This is the result of an XML parser error.'],
+    ['E00004', 'The name of the requested API method is invalid.', 'The name of the root node of the XML request is the API method being called. It is not valid.'],
+    ['E00005', 'The transaction key is invalid or not present.', 'Merchant authentication requires a valid value for transaction key.'],
+    ['E00006', 'The merchant authentication name is invalid or not present.', 'Merchant authentication requires a valid value for name.'],
+    ['E00007', 'User authentication failed due to invalid authentication values.', 'The name/and or transaction key is invalid.'],
+    ['E00008', 'User authentication failed. The payment gateway account or user is inactive.', 'The payment gateway or user is not currently active.'],
+    ['E00009', 'The payment gateway account is in Test Mode. The request cannot be processed.', 'The requested API method cannot be executed while the payment gateway account is in Test Mode.'],
+    ['E00010', 'User authentication failed. You do not have the appropriate permissions.', 'The user does not have permission to call the API.'],
+    ['E00011', 'Access denied. You do not have the appropriate permissions.', 'The user does not have permission to call the API method.'],
+    ['E00012', 'A duplicate subscription already exists.', 'A duplicate of the subscription was already submitted. The duplicate check looks at several fields including payment information, billing information and, specifically for subscriptions, Start Date, Interval and Unit.'],
+    ['E00013', 'The field is invalid.', 'One of the field values is not valid.'],
+    ['E00014', 'A required field is not present.', 'One of the required fields was not present.'],
+    ['E00015', 'The field length is invalid.', 'One of the fields has an invalid length.'],
+    ['E00016', 'The field type is invalid.', 'The field type is not valid.'],
+    ['E00017', 'The startDate cannot occur in the past.', 'The subscription start date cannot occur before the subscription submission date.'],
+    ['E00018', 'The credit card expires before the subscription startDate.', 'The credit card is not valid as of the start date of the subscription.'],
+    ['E00019', 'The customer taxId or driversLicense information is required.', 'The customer tax ID or driver’s license information (driver’s license number, driver’s license state, driver’s license DOB) is required for the subscription.'],
+    ['E00020', 'The payment gateway account is not enabled for eCheck.Net subscriptions.', 'This payment gateway account is not set up to process eCheck.Net subscriptions.'],
+    ['E00021', 'The payment gateway account is not enabled for credit card subscriptions.', 'This payment gateway account is not set up to process credit card subscriptions.'],
+    ['E00022', 'The interval length cannot exceed 365 days or 12 months.', 'The interval length must be 7 to 365 days or 1 to 12 months.'],
+    ['E00024', 'The trialOccurrences is required when trialAmount is specified.', 'The number of trial occurrences cannot be zero if a valid trial amount is submitted.'],
+    ['E00025', 'Automated Recurring Billing is not enabled.', 'The payment gateway account is not enabled for Automated Recurring Billing.'],
+    ['E00026', 'Both trialAmount and trialOccurrences are required.', 'If either a trial amount or number of trial occurrences is specified then values for both must be submitted.'],
+    ['E00027', 'The test transaction was unsuccessful.', 'An approval was not returned for the test transaction.'],
+    ['E00028', 'The trialOccurrences must be less than totalOccurrences.', 'The number of trial occurrences specified must be less than the number of total occurrences specified.'],
+    ['E00029', 'Payment information is required.', 'Payment information is required when creating a subscription.'],
+    ['E00030', 'A paymentSchedule is required.', 'A payment schedule is required when creating a subscription.'],
+    ['E00031', 'The amount is required.', 'The subscription amount is required when creating a subscription.'],
+    ['E00032', 'The startDate is required.', 'The subscription start date is required to create a subscription.'],
+    ['E00033', 'The subscription Start Date cannot be changed.', 'Once a subscription is created the Start Date cannot be changed.'],
+    ['E00034', 'The interval information cannot be changed.', 'Once a subscription is created the subscription interval cannot be changed.'],
+    ['E00035', 'The subscription cannot be found.', 'The subscription ID for this request is not valid for this merchant.'],
+    ['E00036', 'The payment type cannot be changed.', 'Changing the subscription payment type between credit card and eCheck.Net is not currently supported.'],
+    ['E00037', 'The subscription cannot be updated.', 'Subscriptions that are expired, canceled or terminated cannot be updated.'],
+    ['E00038', 'The subscription cannot be canceled.', 'Subscriptions that are expired or terminated cannot be canceled.'],
+    ['E00045', 'The root node does not reference a valid XML namespace.', 'An error exists in the XML namespace. This error is similar to E00003.'],
+
+]
+
 class AuthorizeError(Exception):
     def __init__(self, *args):
         self.args = args
@@ -81,6 +127,7 @@ class AuthorizeError(Exception):
 
 cim_map = {}
 arb_map = {}
+trans_map = {}
 
 def populate(map, from_):
     for code, text, description in from_:
@@ -91,6 +138,7 @@ def populate(map, from_):
 
 populate(cim_map, _cim_response_codes)
 populate(arb_map, _arb_response_codes)
+populate(trans_map, _trans_detail_response_codes)
 
 aim_codes = {
     '1': 'Approved',

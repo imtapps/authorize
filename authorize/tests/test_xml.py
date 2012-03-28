@@ -5,7 +5,7 @@ import decimal
 up = os.path.dirname
 j = os.path.join
 
-from schema import SCHEMA
+from authorize.tests.schema import SCHEMA
 
 try:
     # To run the tests we still need lxml
@@ -13,7 +13,7 @@ try:
 except ImportError:
     raise Exception("lxml 2.0.3+ is needed to run authorize tests")
 
-from authorize import gen_xml as x, responses, cim, arb
+from authorize import gen_xml as x, responses, cim, arb, trans_details
 
 parser = XMLParser()
 schema_validator = XMLSchema(fromstring(SCHEMA, parser))
@@ -29,6 +29,7 @@ def assertValid(s):
 class TestXML(TestCase):
 
     def setUp(self):
+        # CIM
         self.cim_old = cim.Api.request
         def validateRequest(self, body):
             assertValid(body)
@@ -38,13 +39,20 @@ class TestXML(TestCase):
         cim.Api.request = validateRequest
         self.cim = cim.Api(u'foo', u'bar', is_test=True)
 
+        # ARB
         self.arb_old = arb.Api.request
         arb.Api.request = lambda self, body: assertValid(body)
         self.arb = arb.Api(u"foo", u"bar", is_test=True)
 
+        # TRANSACTION_DETAILS
+        self.trans_details_old = trans_details.Api.request
+        trans_details.Api.request = validateRequest
+        self.trans_details = trans_details.Api(u"foo", u"bar", is_test=True)
+
     def tearDown(self):
         cim.Api.request = self.cim_old
         arb.Api.request = self.arb_old
+        trans_details.Api.request = self.trans_details_old
 
     def test_general_examples(self):
         """
@@ -422,3 +430,70 @@ class TestXML(TestCase):
         except KeyError:
             self.arb.cancel_subscription(subscription_id=u"1234")
 
+    def test_get_settled_batch_list(self):
+        """
+        Test that the XML generated for get_settled_batch_list is valid
+        according to the XMLSchema.
+
+        All items are optional.
+        """
+        self.trans_details.get_settled_batch_list(
+            include_statistics = True,
+        )
+
+        self.trans_details.get_settled_batch_list(
+            first_settlement_date=u"2011-01-01T01:00:00",
+        )
+
+        self.trans_details.get_settled_batch_list(
+            last_settlement_date=u"2011-01-01T01:00:00",
+        )
+
+        # all three together
+        self.trans_details.get_settled_batch_list(
+            include_statistics = True,
+            first_settlement_date=u"2011-01-01T01:00:00",
+            last_settlement_date=u"2011-01-02T01:00:00"
+        )
+
+    def test_get_batch_statistics_request(self):
+        """
+        Test that the XML generated for get_batch_statistics is valid
+        according to the XMLSchema.
+
+        batch_id is required.
+        """
+        self.trans_details.get_batch_statistics(
+            batch_id = 123456,
+        )
+
+    def test_get_transaction_list_request(self):
+        """
+        Test that the XML generated for get_transaction_list is valid
+        according to the XMLSchema.
+
+        batch_id is required.
+        """
+        self.trans_details.get_transaction_list(
+            batch_id = 123456,
+        )
+
+    def test_get_unsettled_transaction_list_request(self):
+        """
+        Test that the XML generated for get_unsettled_transaction_list is valid
+        according to the XMLSchema.
+
+        no arguments accepted
+        """
+        self.trans_details.get_unsettled_transaction_list()
+
+    def test_get_transaction_details_request(self):
+        """
+        Test that the XML generated for get_transaction_details is valid
+        according to the XMLSchema.
+
+        trans_id is required.
+        """
+        self.trans_details.get_transaction_details(
+            trans_id = 123456,
+        )

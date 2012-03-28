@@ -558,6 +558,25 @@ def subscription(**kw):
         shipTo(**kw)
     )
 
+# Transaction Details API XML
+def settled_batch_request(**kw):
+    return (
+        x.includeStatistics(kw.get('include_statistics')),
+        x.firstSettlementDate(kw.get('first_settlement_date')),
+        x.lastSettlementDate(kw.get('last_settlement_date')),
+    )
+
+def batch_statistics(**kw):
+    return x.batchId(kw.get('batch_id'))
+
+def transaction_list(**kw):
+    return x.batchId(kw.get('batch_id'))
+
+def transaction_details(**kw):
+    return x.transId(kw.get('trans_id'))
+
+# end transaction details api xml
+
 def base(action, login, key, kw, *main):
     return flatten(
         macro(action, login, key,
